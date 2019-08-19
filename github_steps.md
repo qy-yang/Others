@@ -33,8 +33,10 @@ $ git push -u <upstream><branch>
 # Tips for some errors:
 The authenticity of host 'github.com (192.30.255.112)' can't be established
 The cause of this error is missing a known_host file. The SSH key is supposed to have 3 files, and now is only two files, the solution for this is to input 'yes' to allow the suthenticity.
+```
 \[rejected\] master -> master (fetch first)
 \[rejected\] master -> master (non-fast forward)
+```
 
 The reason for the error is because remote repo is not sync to local, i.e. the repo is not pulled before commit the changes. 
 Few solutions for this:
