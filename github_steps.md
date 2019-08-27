@@ -69,3 +69,20 @@ To set up these two params, you can either update config file or use the followi
 $ git config branch.master.remote origin
 $ git confit branch.master.merge refs/heads/master
 ```
+
+# Steps of creating a pull request / contribute to open source project
+1. Fork the project
+2. Git clone the project to local
+3. Checkout a new new branch to modify the code. This will not affect the master or product branch.
+```bash
+$ git checkout -b fix#187  # fix#187 is the name of the new branch
+```
+4. After tested the updates, add and commit the udpates. Double check the changes by
+```bash
+$ git diff
+```
+Push the changes to local branch:
+```bash
+$ git push origin fix#187
+```
+5. Submit a pull request at github and wait for approval from project admin.
