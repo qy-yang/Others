@@ -91,3 +91,52 @@ for doc in doc_df[4]:
 2. **Creating a Classification Dataset**: downsample the larger class (restaurants) to be roughly the same size as the smaller class.
 3. **Scaling Bag-of-Words with Tf-Idf Transformation**: Tf-idf and $ℓ^2$ normalization are both column operations \(column scaling\) on the data matrix. The solution space is characterized by the column space and the null space of the data matrix. The quality of the trained linear classifier directly depends upon the null space and the column space of the data matrix. The null pace contains “novel” data points that cannot be formulated as linear combinations of existing data; a large null space could be problematic. Column scaling operations do NOT affect the column space and null space much.
 Rank-deficient row space and column space lead to the model being overly provisioned for the problem.
+
+
+# Chapter 5 Categorical Variables: Counting Eggs in the Age of Robotic Chickens
+## Encoding Categorical Variables
+Categorical data: nonordinal data
+
+### One-Hot Encoding
+>sklearn.preprocess.OneHotEncoder / pandas.get_dummies
+- One-hot encoding has degree of freedom equal to number of features k. So there is linear dependent for the model, which result in the training linear model will not be unique.
+- Intercpt represents global mean, linear coefficients represent how much one category differs from global mean.
+- Pros: Redundent. Cons: Missing value can be encoded as all-zero vector
+
+### Dummy Encoding
+- Degree of freedom = k-1, Reference category is represented by a vector of all zeros.
+- Intercpt represents the mean value of the response variable y for the reference category, linear coefficients represent how much one category differs from reference category.
+- Pros: Not redundent. Cons: Cannot handle missing value easily
+
+### Effect Encoding
+- Degree of freedom = k-1, Reference category is represented by a vector of all -1's.
+- Intercpt represents the global mean (called main effect), linear coefficients represent how much one category differs from global mean.  In effect coding, no single feature (coeffcient) represents the reference category, so the effect of the reference category needs to be separately computed as the negative sum of the coefficients of all other categories.
+- Pros: Redundent. Cons: all -1's is a dense vector, expensive in storage and computation
+
+## Dealing with Large Categorical Variables
+1. Do nothing fancy with the encoding. Use a simple model that is cheap to train.
+2. Compress the features. There are two choices:
+   a. Feature hashing, popular with linear models
+   b. Bin counting, popular with linear models as well as trees
+
+### Feature Hashing
+>sklearn.feature_extraction import FeatureHasher
+- Collision: multiple numbers may get mapped to the same
+- Uniform hash function: ensures that roughly the same number of numbers are mapped into each of the m bins
+- The size of the hash table m can be selected based on acceptable errors. 
+- Can be used for models that involve the inner product of feature vectors and coefficients, such as linear models and kernel methods. Perform well for spam filter but bad for targeted advertising.
+- Features are not interpretable after hashing
+
+### Bin Counting
+- Rather than use raw value of categorical variable, use conditional probability of target under that value.
+- Encode features to a single features with a real value between 0 and 1.
+- Odds ratio and log odds ratio for bin counting. Odds is to evaluate 'How much more likely is it for Y to be true when X is true?' 
+$$odds ratio = \frac{P(Y=1|X=1)/P(Y=1|X=1)}{P(Y=1|X=0)/P(Y=1|X=0)}$$
+- Space complexity: O(k), k is # of unique category variables
+- For rare category: 
+   - use special bin if the count of a category is less than threshold
+   - counting-min sketch: rare or frequent alike are mapped through multiple hash func with an output range m << k. Refer to figure 5-4.
+- Guarding against data leakage (higher potential for leakage):
+   - strict separation between training, validation, and test data
+   - add a small random noise with distribution $Laplace(0, 1$ is sufficient to cover up any potential leakage from single data points
+- Counts without bounds: normalise data or use log transform
